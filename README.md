@@ -34,6 +34,47 @@ $ npm i --save @beincom/zanc
 
 ## Quick Start
 
+```ts
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { AppStatesModule } from '@beincom/zanc';
+
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
+
+@Module({
+  imports: [
+    MongooseModule.forRoot(
+      'mongodb://root:root@localhost:2379/?retryWrites=true&w=majority',
+      {
+        dbName: 'mydatabase',
+      },
+    ),
+    AppStatesModule.forRootAsync({
+      name: 'api-service',
+      controllerOptions: {
+        basePath: 'app-states',
+        secretKey: '9b688bd4-9971-4661-bbb0-03f691bc5874',
+      },
+      useFactory: () => {
+        return {
+          notifier: {
+            channel: 'sync-app-states',
+            redisOptions: {
+              host: '127.0.0.1',
+              port: 6379,
+            },
+          },
+        };
+      },
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+```
 
 ## Stay in touch
 
